@@ -207,7 +207,7 @@ resource "aws_ecs_task_definition" "frontend" {
         },
         {
           name  = "NEXT_PUBLIC_APP_NAME"
-          value = "Vibe Coding"
+          value = "CodePlayground"
         },
         {
           name  = "API_BASE_URL"

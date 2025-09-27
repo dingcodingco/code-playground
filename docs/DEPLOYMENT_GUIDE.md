@@ -1,4 +1,4 @@
-# Vibe Coding 배포 가이드
+# CodePlayground 배포 가이드
 
 ## 🐳 Docker 배포 가이드
 
@@ -59,7 +59,7 @@ docker-compose logs -f postgres
 - **프론트엔드**: http://localhost:3000
 - **백엔드 API**: http://localhost:8080
 - **백엔드 Health Check**: http://localhost:8080/actuator/health
-- **PostgreSQL**: localhost:5432 (DB명: vibecoding, 사용자: vibecoding)
+- **PostgreSQL**: localhost:5432 (DB명: codeplayground, 사용자: codeplayground)
 
 ### 환경 변수 설정
 
@@ -67,13 +67,13 @@ docker-compose logs -f postgres
 
 ```env
 # 데이터베이스 설정
-POSTGRES_DB=vibecoding
-POSTGRES_USER=vibecoding
-POSTGRES_PASSWORD=vibecoding123
+POSTGRES_DB=codeplayground
+POSTGRES_USER=codeplayground
+POSTGRES_PASSWORD=codeplayground123
 
 # 백엔드 설정
 SPRING_PROFILES_ACTIVE=docker
-SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/vibecoding
+SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/codeplayground
 
 # 프론트엔드 설정
 NODE_ENV=production
@@ -86,7 +86,7 @@ NEXT_PUBLIC_API_BASE_URL=http://backend:8080/api/v1
 
 - **Backend**: `curl -f http://localhost:8080/actuator/health`
 - **Frontend**: `node healthcheck.js`
-- **PostgreSQL**: `pg_isready -U vibecoding -d vibecoding`
+- **PostgreSQL**: `pg_isready -U codeplayground -d codeplayground`
 
 ### 배포 검증
 
@@ -174,13 +174,13 @@ docker-compose down --rmi all
 #### PostgreSQL 데이터 백업
 ```bash
 # 컨테이너에서 덤프 생성
-docker-compose exec postgres pg_dump -U vibecoding vibecoding > backup.sql
+docker-compose exec postgres pg_dump -U codeplayground codeplayground > backup.sql
 ```
 
 #### PostgreSQL 데이터 복원
 ```bash
 # 덤프 파일에서 복원
-docker-compose exec -T postgres psql -U vibecoding vibecoding < backup.sql
+docker-compose exec -T postgres psql -U codeplayground codeplayground < backup.sql
 ```
 
 ### 로그 관리
@@ -247,4 +247,4 @@ docker-compose logs --since="2024-01-01T00:00:00"
    - PostgreSQL 마스터-슬레이브 설정
    - 자동 페일오버 구성
 
-이 가이드를 참고하여 Vibe Coding 애플리케이션을 성공적으로 배포하세요.
+이 가이드를 참고하여 CodePlayground 애플리케이션을 성공적으로 배포하세요.

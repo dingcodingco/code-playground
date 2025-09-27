@@ -78,7 +78,7 @@
 ## 📁 프로젝트 구조 (모노레포)
 
 ```
-vibe-coding-demo/
+code-playground-demo/
 ├── apps/
 │   ├── frontend/                 # Next.js 애플리케이션
 │   │   ├── app/                 # App Router 구조
@@ -98,7 +98,7 @@ vibe-coding-demo/
 │   │   ├── package.json
 │   │   └── next.config.js
 │   └── backend/                 # Spring Boot API
-│       ├── src/main/java/com/vibecoding/
+│       ├── src/main/java/com/codeplayground/
 │       │   ├── controller/      # REST 컨트롤러
 │       │   │   ├── CodeController.java
 │       │   │   └── ShareController.java

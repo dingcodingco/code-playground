@@ -13,13 +13,13 @@ variable "environment" {
 variable "project_name" {
   description = "Project name"
   type        = string
-  default     = "vibe-coding"
+  default     = "code-playground"
 }
 
 variable "domain_name" {
   description = "Domain name"
   type        = string
-  default     = "vibecoding.com"
+  default     = "codeplayground.com"
 }
 
 # VPC Configuration
@@ -51,13 +51,13 @@ variable "private_subnets" {
 variable "database_name" {
   description = "Database name"
   type        = string
-  default     = "vibecoding"
+  default     = "codeplayground"
 }
 
 variable "database_username" {
   description = "Database username"
   type        = string
-  default     = "vibecoding_admin"
+  default     = "codeplayground_admin"
 }
 
 variable "database_password" {

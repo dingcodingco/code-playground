@@ -1,5 +1,5 @@
 # ================================================================
-# Vibe Coding - AWS Infrastructure Configuration Template
+# CodePlayground - AWS Infrastructure Configuration Template
 # ================================================================
 # INSTRUCTIONS:
 # 1. Copy this file: cp terraform.tfvars.example terraform.tfvars
@@ -10,8 +10,8 @@
 # Basic Configuration
 aws_region   = "ap-northeast-2"  # Change to your preferred AWS region
 environment  = "production"
-project_name = "vibe-coding"
-domain_name  = "vibecoding.com"  # Change to your domain (optional)
+project_name = "code-playground"
+domain_name  = "codeplayground.com"  # Change to your domain (optional)
 
 # VPC Configuration
 vpc_cidr         = "10.0.0.0/16"
@@ -20,8 +20,8 @@ public_subnets   = ["10.0.1.0/24", "10.0.2.0/24"]
 private_subnets  = ["10.0.10.0/24", "10.0.11.0/24"]
 
 # Database Configuration
-database_name     = "vibecoding"
-database_username = "vibecoding_admin"
+database_name     = "codeplayground"
+database_username = "codeplayground_admin"
 database_password = "CHANGE_ME_TO_SECURE_PASSWORD"  # ⚠️ MUST CHANGE for production
 
 # RDS Configuration
@@ -34,14 +34,14 @@ redis_num_nodes = 1
 
 # ECS Configuration - Backend
 # CHANGE THIS: Replace with your ECR repository URL
-backend_image        = "YOUR_ACCOUNT_ID.dkr.ecr.YOUR_REGION.amazonaws.com/vibe-coding-backend:latest"
+backend_image        = "YOUR_ACCOUNT_ID.dkr.ecr.YOUR_REGION.amazonaws.com/code-playground-backend:latest"
 backend_cpu          = 512
 backend_memory       = 1024
 backend_desired_count = 1
 
 # ECS Configuration - Frontend
 # CHANGE THIS: Replace with your ECR repository URL
-frontend_image        = "YOUR_ACCOUNT_ID.dkr.ecr.YOUR_REGION.amazonaws.com/vibe-coding-frontend:latest"
+frontend_image        = "YOUR_ACCOUNT_ID.dkr.ecr.YOUR_REGION.amazonaws.com/code-playground-frontend:latest"
 frontend_cpu          = 256
 frontend_memory       = 512
 frontend_desired_count = 1

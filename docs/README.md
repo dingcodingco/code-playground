@@ -19,8 +19,8 @@ Docker 기반 풀스택 개발부터 AWS 배포까지 학습할 수 있는 교�
 ### 2. 로컬 실행
 ```bash
 # 저장소 클론
-git clone https://github.com/instructor/vibe-coding-demo.git
-cd vibe-coding-demo
+git clone https://github.com/instructor/code-playground-demo.git
+cd code-playground-demo
 
 # Docker Compose로 전체 환경 실행
 docker-compose up --build
@@ -32,7 +32,7 @@ open http://localhost:3000
 ## 📁 프로젝트 구조
 
 ```
-vibe-coding-demo/
+code-playground-demo/
 ├── apps/
 │   ├── frontend/        # Next.js (포트 3000)
 │   └── backend/         # Spring Boot (포트 8080)
@@ -101,8 +101,8 @@ terraform apply
 git push origin main
 
 # 또는 수동 배포
-aws ecs update-service --cluster vibe-coding-cluster --service frontend-service --force-new-deployment
-aws ecs update-service --cluster vibe-coding-cluster --service backend-service --force-new-deployment
+aws ecs update-service --cluster code-playground-cluster --service frontend-service --force-new-deployment
+aws ecs update-service --cluster code-playground-cluster --service backend-service --force-new-deployment
 ```
 
 ## 📊 아키텍처
@@ -219,8 +219,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 지원
 
 - 📧 Email: instructor@example.com
-- 💬 Slack: #vibe-coding-support
-- 🐛 Issues: [GitHub Issues](https://github.com/instructor/vibe-coding-demo/issues)
+- 💬 Slack: #code-playground-support
+- 🐛 Issues: [GitHub Issues](https://github.com/instructor/code-playground-demo/issues)
 
 ---
 

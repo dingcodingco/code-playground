@@ -1,4 +1,4 @@
-# Vibe Coding 프로덕션 배포 가이드
+# CodePlayground 프로덕션 배포 가이드
 
 ## 📋 배포 체크리스트
 
@@ -26,14 +26,14 @@ docker-compose logs -f
 ### 2. 이미지 빌드 및 푸시
 ```bash
 # 백엔드 이미지 빌드
-docker build -t vibe-coding/backend:latest ./apps/backend
+docker build -t code-playground/backend:latest ./apps/backend
 
 # 프론트엔드 이미지 빌드
-docker build -t vibe-coding/frontend:latest ./apps/frontend
+docker build -t code-playground/frontend:latest ./apps/frontend
 
 # 레지스트리에 푸시 (예: Docker Hub)
-docker push vibe-coding/backend:latest
-docker push vibe-coding/frontend:latest
+docker push code-playground/backend:latest
+docker push code-playground/frontend:latest
 ```
 
 ## ☸️ Kubernetes 배포
@@ -67,7 +67,7 @@ kubectl apply -f k8s/postgres/postgres-deployment.yaml
 kubectl apply -f k8s/postgres/postgres-service.yaml
 
 # 상태 확인
-kubectl get pods -n vibe-coding -l app=postgres
+kubectl get pods -n code-playground -l app=postgres
 ```
 
 ### 4. 백엔드 배포
@@ -78,7 +78,7 @@ kubectl apply -f k8s/backend/backend-service.yaml
 kubectl apply -f k8s/backend/backend-hpa.yaml
 
 # 상태 확인
-kubectl get pods -n vibe-coding -l app=backend
+kubectl get pods -n code-playground -l app=backend
 ```
 
 ### 5. 프론트엔드 배포
@@ -89,7 +89,7 @@ kubectl apply -f k8s/frontend/frontend-service.yaml
 kubectl apply -f k8s/frontend/frontend-hpa.yaml
 
 # 상태 확인
-kubectl get pods -n vibe-coding -l app=frontend
+kubectl get pods -n code-playground -l app=frontend
 ```
 
 ### 6. Ingress 설정
@@ -122,7 +122,7 @@ kubectl apply -f k8s/security/rbac.yaml
 ```bash
 # Prometheus Operator 설치
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm install prometheus prometheus-community/kube-prometheus-stack -n vibe-coding
+helm install prometheus prometheus-community/kube-prometheus-stack -n code-playground
 
 # ConfigMap 적용
 kubectl apply -f k8s/monitoring/prometheus-configmap.yaml
@@ -134,7 +134,7 @@ kubectl apply -f k8s/monitoring/prometheus-configmap.yaml
 kubectl apply -f k8s/monitoring/grafana-dashboard.yaml
 
 # Grafana 접속 (포트 포워딩)
-kubectl port-forward -n vibe-coding svc/prometheus-grafana 3000:80
+kubectl port-forward -n code-playground svc/prometheus-grafana 3000:80
 ```
 
 ### 로그 수집 (Fluent Bit)
@@ -144,7 +144,7 @@ kubectl apply -f k8s/monitoring/fluent-bit-configmap.yaml
 
 # Fluent Bit DaemonSet 배포
 helm repo add fluent https://fluent.github.io/helm-charts
-helm install fluent-bit fluent/fluent-bit -n vibe-coding
+helm install fluent-bit fluent/fluent-bit -n code-playground
 ```
 
 ## 🔄 CI/CD 파이프라인 설정
@@ -240,17 +240,17 @@ kubectl autoscale nodes --min=3 --max=10
 ### 배포 실패 시 롤백
 ```bash
 # 이전 버전으로 롤백
-kubectl rollout undo deployment/backend -n vibe-coding
-kubectl rollout undo deployment/frontend -n vibe-coding
+kubectl rollout undo deployment/backend -n code-playground
+kubectl rollout undo deployment/frontend -n code-playground
 
 # 특정 버전으로 롤백
-kubectl rollout undo deployment/backend --to-revision=2 -n vibe-coding
+kubectl rollout undo deployment/backend --to-revision=2 -n code-playground
 ```
 
 ### 데이터베이스 롤백
 ```bash
 # 백업에서 복원
-kubectl exec -it postgres-pod -n vibe-coding -- psql -U vibecoding < backup.sql
+kubectl exec -it postgres-pod -n code-playground -- psql -U codeplayground < backup.sql
 ```
 
 ## 📝 운영 매뉴얼
@@ -290,9 +290,9 @@ kubectl exec -it postgres-pod -n vibe-coding -- psql -U vibecoding < backup.sql
 ## 📞 연락처
 
 ### 담당자 정보
-- **개발팀**: dev@vibecoding.com
-- **운영팀**: ops@vibecoding.com
-- **보안팀**: security@vibecoding.com
+- **개발팀**: dev@codeplayground.com
+- **운영팀**: ops@codeplayground.com
+- **보안팀**: security@codeplayground.com
 
 ### 긴급 연락망
 - **On-Call Engineer**: +82-10-XXXX-XXXX

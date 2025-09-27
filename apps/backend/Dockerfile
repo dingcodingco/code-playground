@@ -32,9 +32,9 @@ RUN ls -la build/libs/
 FROM eclipse-temurin:21-jre
 
 # 메타데이터 라벨
-LABEL maintainer="Vibe Coding Team <team@vibecoding.com>"
+LABEL maintainer="CodePlayground Team <team@codeplayground.com>"
 LABEL version="1.0.0"
-LABEL description="Vibe Coding Backend Service"
+LABEL description="CodePlayground Backend Service"
 
 # 시스템 업데이트 및 필요 패키지 설치
 RUN apt-get update && apt-get install -y \
@@ -58,7 +58,7 @@ RUN groupadd -r appuser && useradd -r -g appuser appuser
 WORKDIR /app
 
 # 코드 실행을 위한 임시 디렉토리 생성
-RUN mkdir -p /tmp/vibe-coding-exec && chown -R appuser:appuser /tmp/vibe-coding-exec
+RUN mkdir -p /tmp/code-playground-exec && chown -R appuser:appuser /tmp/code-playground-exec
 
 # 빌드된 JAR 파일 복사
 COPY --from=builder /app/build/libs/*.jar app.jar

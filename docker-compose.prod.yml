@@ -35,7 +35,7 @@ services:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=production
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/vibecoding
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/codeplayground
       - SPRING_DATASOURCE_USERNAME=${DATABASE_USER}
       - SPRING_DATASOURCE_PASSWORD=${DATABASE_PASSWORD}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
@@ -60,7 +60,7 @@ services:
     image: postgres:15-alpine
     container_name: vibe-postgres
     environment:
-      - POSTGRES_DB=vibecoding
+      - POSTGRES_DB=codeplayground
       - POSTGRES_USER=${DATABASE_USER}
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
     volumes:
@@ -69,7 +69,7 @@ services:
       - vibe-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d vibecoding"]
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d codeplayground"]
       interval: 30s
       timeout: 10s
       retries: 3

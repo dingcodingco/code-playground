@@ -66,8 +66,8 @@ terraform --version
 ### 1. 저장소 클론 및 초기 설정
 ```bash
 # 프로젝트 클론
-git clone https://github.com/instructor/vibe-coding-demo.git
-cd vibe-coding-demo
+git clone https://github.com/instructor/code-playground-demo.git
+cd code-playground-demo
 
 # 프로젝트 구조 확인
 tree -I 'node_modules|.git|build|.next'
@@ -118,7 +118,7 @@ server:
 
 logging:
   level:
-    com.vibecoding: DEBUG
+    com.codeplayground: DEBUG
     org.springframework.web: DEBUG
 EOF
 ```
@@ -218,7 +218,7 @@ curl -X POST http://localhost:8080/api/code/execute \
 ## 📁 상세 프로젝트 구조
 
 ```
-vibe-coding-demo/
+code-playground-demo/
 ├── apps/
 │   ├── frontend/                    # Next.js 애플리케이션
 │   │   ├── app/                    # App Router (Next.js 13+)
@@ -246,7 +246,7 @@ vibe-coding-demo/
 │   │   ├── tailwind.config.js      # Tailwind CSS 설정
 │   │   └── tsconfig.json           # TypeScript 설정
 │   └── backend/                    # Spring Boot 애플리케이션
-│       ├── src/main/java/com/vibecoding/
+│       ├── src/main/java/com/codeplayground/
 │       │   ├── controller/         # REST 컨트롤러
 │       │   │   ├── CodeController.java      # 코드 실행 API
 │       │   │   ├── ShareController.java     # 공유 API
@@ -326,7 +326,7 @@ vibe-coding-demo/
       "name": "Spring Boot Debug",
       "type": "java",
       "request": "launch",
-      "mainClass": "com.vibecoding.VibecodingApplication",
+      "mainClass": "com.codeplayground.VibecodingApplication",
       "projectName": "backend"
     }
   ]

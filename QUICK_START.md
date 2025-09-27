@@ -1,6 +1,6 @@
-# ⚡ Vibe Coding - Quick Start Guide
+# ⚡ CodePlayground - Quick Start Guide
 
-This guide helps you deploy Vibe Coding to AWS in less than 10 minutes.
+This guide helps you deploy CodePlayground to AWS in less than 10 minutes.
 
 ## 📋 Prerequisites
 
@@ -14,7 +14,7 @@ This guide helps you deploy Vibe Coding to AWS in less than 10 minutes.
 ### Step 1: Clone and Setup
 ```bash
 git clone <repository-url>
-cd vibe-coding
+cd code-playground
 ```
 
 ### Step 2: Configure AWS
@@ -53,12 +53,12 @@ chmod +x deploy.sh
 ### Step 5: Access Your Application
 ```bash
 # Get your application URL from the output
-# Example: http://vibe-coding-alb-123456789.region.elb.amazonaws.com
+# Example: http://code-playground-alb-123456789.region.elb.amazonaws.com
 ```
 
 ## 🎉 That's It!
 
-Your Vibe Coding platform is now running on AWS with:
+Your CodePlayground platform is now running on AWS with:
 - ✅ Auto-scaling containers (ECS)
 - ✅ Load balancer (ALB)
 - ✅ Managed database (RDS PostgreSQL)
@@ -105,7 +105,7 @@ open http://localhost:3000
 4. **Application not accessible**
    ```bash
    # Check ECS service status
-   aws ecs describe-services --services vibe-coding-frontend
+   aws ecs describe-services --services code-playground-frontend
    ```
 
 **Get Support:**

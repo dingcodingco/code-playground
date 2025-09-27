@@ -7,7 +7,7 @@
 ## 🌐 API 설계
 
 ### 기본 정보
-- **Base URL**: `https://api.vibecoding.com` (프로덕션)
+- **Base URL**: `https://api.codeplayground.com` (프로덕션)
 - **Base URL**: `http://localhost:8080` (로컬 개발)
 - **Content-Type**: `application/json`
 - **Authentication**: Session-based (간단한 구현)
@@ -62,7 +62,7 @@
   "response": {
     "success": true,
     "codeId": "code_1234567890",
-    "shareUrl": "https://vibecoding.com/share/abc123def",
+    "shareUrl": "https://codeplayground.com/share/abc123def",
     "createdAt": "2024-01-01T12:00:00Z"
   }
 }
@@ -100,7 +100,7 @@
   "response": {
     "success": true,
     "shareId": "abc123def",
-    "shareUrl": "https://vibecoding.com/share/abc123def",
+    "shareUrl": "https://codeplayground.com/share/abc123def",
     "expiresAt": "2024-02-01T12:00:00Z"
   }
 }

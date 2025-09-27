@@ -33,9 +33,9 @@ RUN npm run build
 FROM node:20-alpine AS runner
 
 # 메타데이터 라벨
-LABEL maintainer="Vibe Coding Team <team@vibecoding.com>"
+LABEL maintainer="CodePlayground Team <team@codeplayground.com>"
 LABEL version="1.0.0"
-LABEL description="Vibe Coding Frontend Service"
+LABEL description="CodePlayground Frontend Service"
 
 WORKDIR /app
 
