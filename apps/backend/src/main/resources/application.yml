@@ -1,0 +1,240 @@
+# 바이브코딩 데모 프로젝트 기본 설정
+spring:
+  application:
+    name: vibe-coding-backend
+
+  profiles:
+    default: local
+
+  # SQL 초기화 비활성화 (Flyway 사용)
+  sql:
+    init:
+      mode: never
+
+  # JPA 설정
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+        query:
+          plan_cache_max_size: 4096
+    show-sql: false
+
+  # Jackson 설정
+  jackson:
+    time-zone: UTC
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+  # 멀티파트 설정
+  servlet:
+    multipart:
+      max-file-size: 1MB
+      max-request-size: 1MB
+
+# 서버 설정
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+    min-response-size: 1024
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain,application/javascript,text/css
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: on_param
+
+# 액추에이터 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  info:
+    env:
+      enabled: true
+
+# 로깅 설정
+logging:
+  level:
+    com.vibecoding: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.type: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# OpenAPI 문서 설정
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    display-request-duration: true
+    groups-order: DESC
+    operationsSorter: method
+    disable-swagger-default-url: true
+    use-root-path: true
+
+# 애플리케이션 설정
+app:
+  base-url: ${APP_BASE_URL:http://localhost:3000}
+
+# 코드 실행 설정
+vibe-coding:
+  execution:
+    timeout: 30000  # 30초
+    max-code-length: 10240  # 10KB
+    supported-languages:
+      - javascript
+      - python
+      - java
+    work-directory: /tmp/vibe-coding-exec
+
+  # 보안 설정
+  security:
+    cors:
+      allowed-origins:
+        - http://localhost:3000
+        - http://localhost:3001
+      allowed-methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - OPTIONS
+      allowed-headers: "*"
+      allow-credentials: true
+      max-age: 3600
+
+  # 공유 설정
+  sharing:
+    share-id-length: 12
+    default-expiry-days: 30
+    max-expiry-days: 365
+
+---
+# 로컬 개발 환경
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+
+# 개발환경 로깅
+logging:
+  level:
+    com.vibecoding: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+---
+# 테스트 환경
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+logging:
+  level:
+    com.vibecoding: WARN
+    org.springframework: WARN
+
+---
+# 프로덕션 환경
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/vibecoding}
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME:vibe_user}
+    password: ${DB_PASSWORD:vibe_password}
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      leak-detection-threshold: 60000
+
+  # Flyway 데이터베이스 마이그레이션 설정
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    validate-on-migrate: true
+    clean-disabled: true
+    baseline-on-migrate: true
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+logging:
+  level:
+    com.vibecoding: INFO
+    org.springframework: INFO
+  file:
+    name: logs/vibe-coding-backend.log
+
+# 프로덕션 보안 설정
+vibe-coding:
+  security:
+    cors:
+      allowed-origins:
+        - https://${DOMAIN_NAME:vibecoding.com}
+        - https://www.${DOMAIN_NAME:vibecoding.com}

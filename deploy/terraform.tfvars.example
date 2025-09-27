@@ -1,0 +1,70 @@
+# ================================================================
+# Vibe Coding - AWS Infrastructure Configuration Template
+# ================================================================
+# INSTRUCTIONS:
+# 1. Copy this file: cp terraform.tfvars.example terraform.tfvars
+# 2. Update all values marked with "CHANGE_ME" and "YOUR_*"
+# 3. Run: ./deploy.sh from the project root
+# ================================================================
+
+# Basic Configuration
+aws_region   = "ap-northeast-2"  # Change to your preferred AWS region
+environment  = "production"
+project_name = "vibe-coding"
+domain_name  = "vibecoding.com"  # Change to your domain (optional)
+
+# VPC Configuration
+vpc_cidr         = "10.0.0.0/16"
+availability_zones = ["ap-northeast-2a", "ap-northeast-2c"]  # Update based on your region
+public_subnets   = ["10.0.1.0/24", "10.0.2.0/24"]
+private_subnets  = ["10.0.10.0/24", "10.0.11.0/24"]
+
+# Database Configuration
+database_name     = "vibecoding"
+database_username = "vibecoding_admin"
+database_password = "CHANGE_ME_TO_SECURE_PASSWORD"  # ⚠️ MUST CHANGE for production
+
+# RDS Configuration
+rds_instance_class    = "db.t3.micro"  # Upgrade to larger instance for production
+rds_allocated_storage = 20
+
+# ElastiCache Configuration (Optional - can be disabled)
+redis_node_type = "cache.t3.micro"
+redis_num_nodes = 1
+
+# ECS Configuration - Backend
+# CHANGE THIS: Replace with your ECR repository URL
+backend_image        = "YOUR_ACCOUNT_ID.dkr.ecr.YOUR_REGION.amazonaws.com/vibe-coding-backend:latest"
+backend_cpu          = 512
+backend_memory       = 1024
+backend_desired_count = 1
+
+# ECS Configuration - Frontend
+# CHANGE THIS: Replace with your ECR repository URL
+frontend_image        = "YOUR_ACCOUNT_ID.dkr.ecr.YOUR_REGION.amazonaws.com/vibe-coding-frontend:latest"
+frontend_cpu          = 256
+frontend_memory       = 512
+frontend_desired_count = 1
+
+# Secrets Configuration
+jwt_secret = "CHANGE_ME_TO_SECURE_JWT_SECRET"  # ⚠️ MUST CHANGE for production
+
+# SSL Certificates (Optional - uncomment and configure if you have ACM certificates)
+# ssl_certificate_arn = "arn:aws:acm:ap-northeast-2:YOUR_ACCOUNT:certificate/YOUR_CERTIFICATE_ID"
+# cloudfront_certificate_arn = "arn:aws:acm:us-east-1:YOUR_ACCOUNT:certificate/YOUR_CERTIFICATE_ID"
+
+# ================================================================
+# QUICK SETUP GUIDE:
+# ================================================================
+# 1. Get your AWS Account ID:
+#    aws sts get-caller-identity --query Account --output text
+#
+# 2. Replace YOUR_ACCOUNT_ID with the actual account ID
+# 3. Replace YOUR_REGION with your preferred AWS region
+# 4. Generate secure passwords:
+#    - Database password (use a password manager)
+#    - JWT secret (generate random 256-bit key)
+#
+# 5. Save this file as terraform.tfvars and run:
+#    ./deploy.sh
+# ================================================================

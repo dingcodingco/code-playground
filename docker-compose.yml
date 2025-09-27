@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  # Frontend - Next.js
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_BASE_URL=http://backend:8080/api/v1
+      - HOSTNAME=0.0.0.0
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - vibe-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Backend - Spring Boot
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/vibecoding
+      - SPRING_DATASOURCE_USERNAME=vibecoding
+      - SPRING_DATASOURCE_PASSWORD=vibecoding123
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
+      - JAVA_OPTS=-Xms512m -Xmx1024m -XX:+UseG1GC
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vibe-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: vibe-coding-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=vibecoding
+      - POSTGRES_USER=vibecoding
+      - POSTGRES_PASSWORD=vibecoding123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - vibe-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vibecoding -d vibecoding"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Redis (캐싱용 - 선택사항)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - vibe-network
+    restart: unless-stopped
+    profiles:
+      - cache
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  vibe-network:
+    driver: bridge
