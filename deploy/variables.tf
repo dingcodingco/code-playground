@@ -69,7 +69,7 @@ variable "database_password" {
 variable "rds_instance_class" {
   description = "RDS instance class"
   type        = string
-  default     = "db.t3.medium"
+  default     = "db.t3.micro"
 }
 
 variable "rds_allocated_storage" {
@@ -136,7 +136,7 @@ variable "frontend_memory" {
 variable "frontend_desired_count" {
   description = "Frontend desired count"
   type        = number
-  default     = 3
+  default     = 1
 }
 
 # SSL Certificates
