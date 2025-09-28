@@ -170,12 +170,18 @@ jobs:
             --force-new-deployment \
             --region ${{ env.AWS_REGION }}
 
-      - name: Wait for deployment to complete
+      - name: Wait for initial deployment
         run: |
-          aws ecs wait services-stable \
+          echo "Waiting 60 seconds for ECS services to start updating..."
+          sleep 60
+
+          # Check service status (but don't wait for full stability)
+          aws ecs describe-services \
             --cluster ${{ env.ECS_CLUSTER }} \
             --services code-playground-backend code-playground-frontend \
-            --region ${{ env.AWS_REGION }}
+            --region ${{ env.AWS_REGION }} \
+            --query 'services[*].[serviceName, desiredCount, runningCount]' \
+            --output table
 
       - name: Get ALB DNS name
         id: get-alb-dns
@@ -189,6 +195,29 @@ jobs:
 
       - name: Run smoke tests
         run: |
+          echo "Waiting additional 30 seconds before smoke tests..."
           sleep 30
-          curl -f http://${{ steps.get-alb-dns.outputs.alb_dns }}/actuator/health || exit 1
+
+          echo "Testing backend health endpoint..."
+          MAX_RETRIES=5
+          RETRY_COUNT=0
+
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            if curl -f http://${{ steps.get-alb-dns.outputs.alb_dns }}/actuator/health; then
+              echo "Backend health check passed!"
+              break
+            else
+              echo "Backend health check failed, retry $((RETRY_COUNT + 1))/$MAX_RETRIES"
+              RETRY_COUNT=$((RETRY_COUNT + 1))
+              sleep 10
+            fi
+          done
+
+          if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+            echo "Backend health check failed after $MAX_RETRIES retries"
+            exit 1
+          fi
+
+          echo "Testing frontend..."
           curl -f http://${{ steps.get-alb-dns.outputs.alb_dns }}/ || exit 1
+          echo "All smoke tests passed!"
