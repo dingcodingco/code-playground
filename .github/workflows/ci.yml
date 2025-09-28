@@ -213,7 +213,7 @@ jobs:
       - name: Run OWASP Dependency Check
         uses: dependency-check/Dependency-Check_Action@main
         with:
-          project: 'vibe-coding'
+          project: 'code-playground'
           path: '.'
           format: 'HTML'
 
@@ -236,19 +236,24 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ secrets.DOCKER_USERNAME }}/vibe-coding-backend
-            ${{ secrets.DOCKER_USERNAME }}/vibe-coding-frontend
+            851725513597.dkr.ecr.us-east-1.amazonaws.com/code-playground-backend
+            851725513597.dkr.ecr.us-east-1.amazonaws.com/code-playground-frontend
           tags: |
             type=ref,event=branch
             type=sha,prefix={{branch}}-
@@ -260,11 +265,11 @@ jobs:
           context: ./apps/backend
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/vibe-coding-backend:${{ github.sha }}
-            ${{ secrets.DOCKER_USERNAME }}/vibe-coding-backend:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/vibe-coding-backend:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/vibe-coding-backend:buildcache,mode=max
-          platforms: linux/amd64,linux/arm64
+            851725513597.dkr.ecr.us-east-1.amazonaws.com/code-playground-backend:${{ github.sha }}
+            851725513597.dkr.ecr.us-east-1.amazonaws.com/code-playground-backend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
 
       - name: Build and push frontend image
         uses: docker/build-push-action@v5
@@ -272,23 +277,23 @@ jobs:
           context: ./apps/frontend
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/vibe-coding-frontend:${{ github.sha }}
-            ${{ secrets.DOCKER_USERNAME }}/vibe-coding-frontend:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/vibe-coding-frontend:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/vibe-coding-frontend:buildcache,mode=max
-          platforms: linux/amd64,linux/arm64
+            851725513597.dkr.ecr.us-east-1.amazonaws.com/code-playground-frontend:${{ github.sha }}
+            851725513597.dkr.ecr.us-east-1.amazonaws.com/code-playground-frontend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
 
       - name: Run Trivy on backend image
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ secrets.DOCKER_USERNAME }}/vibe-coding-backend:${{ github.sha }}
+          image-ref: 851725513597.dkr.ecr.us-east-1.amazonaws.com/code-playground-backend:${{ github.sha }}
           format: 'sarif'
           output: 'backend-trivy.sarif'
 
       - name: Run Trivy on frontend image
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ secrets.DOCKER_USERNAME }}/vibe-coding-frontend:${{ github.sha }}
+          image-ref: 851725513597.dkr.ecr.us-east-1.amazonaws.com/code-playground-frontend:${{ github.sha }}
           format: 'sarif'
           output: 'frontend-trivy.sarif'
 
