@@ -77,7 +77,7 @@ jobs:
           REDIS_HOST: localhost
           REDIS_PORT: 6379
         run: |
-          ./gradlew test jacocoTestReport
+          ./gradlew test
 
       - name: Upload test results
         if: always()
@@ -86,12 +86,6 @@ jobs:
           name: backend-test-results
           path: apps/backend/build/reports/tests/
 
-      - name: Upload coverage reports
-        uses: codecov/codecov-action@v3
-        with:
-          files: apps/backend/build/reports/jacoco/test/jacocoTestReport.xml
-          flags: backend
-          name: backend-coverage
 
       - name: Run checkstyle
         working-directory: apps/backend
@@ -135,12 +129,6 @@ jobs:
           name: frontend-test-results
           path: apps/frontend/coverage/
 
-      - name: Upload coverage reports
-        uses: codecov/codecov-action@v3
-        with:
-          files: apps/frontend/coverage/lcov.info
-          flags: frontend
-          name: frontend-coverage
 
   e2e-test:
     name: E2E Tests
