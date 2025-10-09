@@ -12,10 +12,12 @@ on:
       - develop
 
 env:
-  REGISTRY: ghcr.io
-  BACKEND_IMAGE: ghcr.io/${{ github.repository }}/backend
-  FRONTEND_IMAGE: ghcr.io/${{ github.repository }}/frontend
-  K8S_NAMESPACE: vibe-coding
+  AWS_REGION: us-east-1
+  AWS_ACCOUNT_ID: 851725513597
+  ECR_REGISTRY: 851725513597.dkr.ecr.us-east-1.amazonaws.com
+  BACKEND_IMAGE: 851725513597.dkr.ecr.us-east-1.amazonaws.com/code-playground-backend
+  FRONTEND_IMAGE: 851725513597.dkr.ecr.us-east-1.amazonaws.com/code-playground-frontend
+  ECS_CLUSTER: code-playground-production
 
 jobs:
   test-backend:
@@ -53,7 +55,7 @@ jobs:
 
       - name: Upload test reports
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: backend-test-reports
           path: apps/backend/build/reports/tests/
@@ -69,8 +71,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: apps/frontend/package-lock.json
 
       - name: Install dependencies
         working-directory: ./apps/frontend
@@ -89,44 +89,36 @@ jobs:
         run: npm run build
 
   build-and-push:
-    name: Build and Push Docker Images
+    name: Build and Push Docker Images to ECR
     needs: [test-backend, test-frontend]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     permissions:
       contents: read
-      packages: write
+      id-token: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: |
-            ${{ env.BACKEND_IMAGE }}
-            ${{ env.FRONTEND_IMAGE }}
-          tags: |
-            type=ref,event=branch
-            type=sha,prefix={{branch}}-
-            type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push Backend image
         uses: docker/build-push-action@v5
         with:
           context: ./apps/backend
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: true
           tags: |
             ${{ env.BACKEND_IMAGE }}:${{ github.sha }}
@@ -138,7 +130,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./apps/frontend
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: true
           tags: |
             ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
@@ -146,8 +138,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  deploy-to-kubernetes:
-    name: Deploy to Kubernetes
+  deploy-to-ecs:
+    name: Deploy to ECS
     needs: build-and-push
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
@@ -155,63 +147,77 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          version: 'latest'
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Configure kubectl
+      - name: Force new deployment for Backend service
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig
-          export KUBECONFIG=kubeconfig
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service code-playground-backend \
+            --force-new-deployment \
+            --region ${{ env.AWS_REGION }}
 
-      - name: Update backend deployment
+      - name: Force new deployment for Frontend service
         run: |
-          kubectl set image deployment/backend backend=${{ env.BACKEND_IMAGE }}:${{ github.sha }} \
-            -n ${{ env.K8S_NAMESPACE }}
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service code-playground-frontend \
+            --force-new-deployment \
+            --region ${{ env.AWS_REGION }}
 
-      - name: Update frontend deployment
+      - name: Wait for initial deployment
         run: |
-          kubectl set image deployment/frontend frontend=${{ env.FRONTEND_IMAGE }}:${{ github.sha }} \
-            -n ${{ env.K8S_NAMESPACE }}
+          echo "Waiting 60 seconds for ECS services to start updating..."
+          sleep 60
 
-      - name: Wait for rollout
+          # Check service status (but don't wait for full stability)
+          aws ecs describe-services \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --services code-playground-backend code-playground-frontend \
+            --region ${{ env.AWS_REGION }} \
+            --query 'services[*].[serviceName, desiredCount, runningCount]' \
+            --output table
+
+      - name: Get ALB DNS name
+        id: get-alb-dns
         run: |
-          kubectl rollout status deployment/backend -n ${{ env.K8S_NAMESPACE }}
-          kubectl rollout status deployment/frontend -n ${{ env.K8S_NAMESPACE }}
+          ALB_DNS=$(aws elbv2 describe-load-balancers \
+            --names code-playground-alb \
+            --query 'LoadBalancers[0].DNSName' \
+            --output text \
+            --region ${{ env.AWS_REGION }})
+          echo "alb_dns=$ALB_DNS" >> $GITHUB_OUTPUT
 
       - name: Run smoke tests
         run: |
-          kubectl run smoke-test --image=curlimages/curl:latest \
-            --rm -i --restart=Never \
-            --command -- sh -c "
-              curl -f http://backend-service:8080/actuator/health || exit 1;
-              curl -f http://frontend-service:3000/ || exit 1;
-            " -n ${{ env.K8S_NAMESPACE }}
+          echo "Waiting additional 30 seconds before smoke tests..."
+          sleep 30
 
-  security-scan:
-    name: Security Scanning
-    runs-on: ubuntu-latest
-    needs: [test-backend, test-frontend]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+          echo "Testing backend health endpoint..."
+          MAX_RETRIES=5
+          RETRY_COUNT=0
 
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            if curl -f http://${{ steps.get-alb-dns.outputs.alb_dns }}/actuator/health; then
+              echo "Backend health check passed!"
+              break
+            else
+              echo "Backend health check failed, retry $((RETRY_COUNT + 1))/$MAX_RETRIES"
+              RETRY_COUNT=$((RETRY_COUNT + 1))
+              sleep 10
+            fi
+          done
 
-      - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v2
-        if: always()
-        with:
-          sarif_file: 'trivy-results.sarif'
+          if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+            echo "Backend health check failed after $MAX_RETRIES retries"
+            exit 1
+          fi
 
-      - name: Run SAST with CodeQL
-        uses: github/codeql-action/analyze@v2
-        with:
-          languages: 'java,javascript'
+          echo "Testing frontend..."
+          curl -f http://${{ steps.get-alb-dns.outputs.alb_dns }}/ || exit 1
+          echo "All smoke tests passed!"

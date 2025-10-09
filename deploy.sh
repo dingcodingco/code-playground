@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # ================================================================
-# Vibe Coding - AWS Deployment Script
+# CodePlayground - AWS Deployment Script
 # ================================================================
-# This script builds and deploys the Vibe Coding application to AWS
+# This script builds and deploys the CodePlayground application to AWS
 # ================================================================
 
 set -e  # Exit on any error
@@ -16,8 +16,8 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-REGION="ap-northeast-2"
-PROJECT_NAME="vibe-coding"
+REGION="us-east-1"
+PROJECT_NAME="code-playground"
 
 # Print colored output
 print_info() {
@@ -125,13 +125,13 @@ deploy_infrastructure() {
 
 # Main deployment process
 main() {
-    print_info "🚀 Starting Vibe Coding deployment..."
+    print_info "🚀 Starting CodePlayground deployment..."
 
     check_aws_config
     check_prerequisites
+    deploy_infrastructure
     build_images
     push_images
-    deploy_infrastructure
 
     print_success "🎉 Deployment completed successfully!"
     print_info "Your application should be available in a few minutes."
@@ -139,14 +139,18 @@ main() {
 
 # Help function
 show_help() {
-    echo "Vibe Coding Deployment Script"
+    echo "CodePlayground Deployment Script"
     echo ""
     echo "Usage: $0 [OPTION]"
     echo ""
     echo "Options:"
     echo "  -h, --help     Show this help message"
-    echo "  --build-only   Only build and push images"
+    echo "  --build-only   Only build and push images (requires infrastructure to be deployed first)"
     echo "  --infra-only   Only deploy infrastructure"
+    echo ""
+    echo "Deployment order:"
+    echo "1. Infrastructure deployment (creates ECR repositories)"
+    echo "2. Docker image build and push"
     echo ""
     echo "Before running:"
     echo "1. Configure AWS CLI: aws configure"
@@ -162,6 +166,7 @@ case "${1:-}" in
         ;;
     --build-only)
         print_info "Building and pushing images only..."
+        print_warning "Note: This assumes infrastructure is already deployed (ECR repositories exist)"
         check_aws_config
         check_prerequisites
         build_images

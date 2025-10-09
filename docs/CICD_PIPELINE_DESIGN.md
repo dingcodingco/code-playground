@@ -304,8 +304,8 @@ on:
 env:
   AWS_REGION: ap-northeast-2
   ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com
-  FRONTEND_REPOSITORY: vibe-coding-frontend
-  BACKEND_REPOSITORY: vibe-coding-backend
+  FRONTEND_REPOSITORY: code-playground-frontend
+  BACKEND_REPOSITORY: code-playground-backend
 
 jobs:
   build-and-deploy:
@@ -350,14 +350,14 @@ jobs:
       run: |
         # Frontend 서비스 업데이트
         aws ecs update-service \
-          --cluster vibe-coding-cluster \
+          --cluster code-playground-cluster \
           --service frontend-service \
           --force-new-deployment \
           --region $AWS_REGION
 
         # Backend 서비스 업데이트
         aws ecs update-service \
-          --cluster vibe-coding-cluster \
+          --cluster code-playground-cluster \
           --service backend-service \
           --force-new-deployment \
           --region $AWS_REGION
@@ -366,13 +366,13 @@ jobs:
       run: |
         echo "Waiting for frontend deployment..."
         aws ecs wait services-stable \
-          --cluster vibe-coding-cluster \
+          --cluster code-playground-cluster \
           --services frontend-service \
           --region $AWS_REGION
 
         echo "Waiting for backend deployment..."
         aws ecs wait services-stable \
-          --cluster vibe-coding-cluster \
+          --cluster code-playground-cluster \
           --services backend-service \
           --region $AWS_REGION
 
@@ -384,7 +384,7 @@ jobs:
         sleep 30  # 서비스 안정화 대기
 
         ALB_DNS=$(aws elbv2 describe-load-balancers \
-          --names vibe-coding-alb \
+          --names code-playground-alb \
           --query 'LoadBalancers[0].DNSName' \
           --output text \
           --region $AWS_REGION)
@@ -531,7 +531,7 @@ DB_PASSWORD: your-secure-password    # RDS 패스워드
 SSL_CERTIFICATE_ARN: arn:aws:acm:... # ACM 인증서 ARN
 
 # 기타
-DOMAIN_NAME: vibecoding.com          # 도메인 이름 (옵션)
+DOMAIN_NAME: codeplayground.com          # 도메인 이름 (옵션)
 ```
 
 ### Secrets 보안 설정

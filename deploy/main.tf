@@ -13,63 +13,45 @@ provider "aws" {
   region = var.aws_region
 }
 
-# VPC
-resource "aws_vpc" "main" {
-  cidr_block           = var.vpc_cidr
-  enable_dns_hostnames = true
-  enable_dns_support   = true
+# Use existing default VPC
+data "aws_vpc" "main" {
+  default = true
+}
 
-  tags = {
-    Name = "${var.project_name}-vpc"
-    Environment = var.environment
+# Use existing Internet Gateway
+data "aws_internet_gateway" "main" {
+  filter {
+    name   = "attachment.vpc-id"
+    values = [data.aws_vpc.main.id]
   }
 }
 
-# Internet Gateway
-resource "aws_internet_gateway" "main" {
-  vpc_id = aws_vpc.main.id
-
-  tags = {
-    Name = "${var.project_name}-igw"
-    Environment = var.environment
+# Use existing subnets
+data "aws_subnets" "public" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.main.id]
+  }
+  
+  filter {
+    name   = "map-public-ip-on-launch"
+    values = ["true"]
   }
 }
 
-# Public Subnets
-resource "aws_subnet" "public" {
-  count             = length(var.public_subnets)
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = var.public_subnets[count.index]
-  availability_zone = var.availability_zones[count.index]
-
-  map_public_ip_on_launch = true
-
-  tags = {
-    Name = "${var.project_name}-public-${count.index + 1}"
-    Environment = var.environment
-  }
-}
-
-# Private Subnets
-resource "aws_subnet" "private" {
-  count             = length(var.private_subnets)
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = var.private_subnets[count.index]
-  availability_zone = var.availability_zones[count.index]
-
-  tags = {
-    Name = "${var.project_name}-private-${count.index + 1}"
-    Environment = var.environment
-  }
+# Public Subnets (for reference, using data source)
+data "aws_subnet" "public" {
+  count = length(data.aws_subnets.public.ids)
+  id    = data.aws_subnets.public.ids[count.index]
 }
 
 # Route Table for Public Subnets
 resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.main.id
+  vpc_id = data.aws_vpc.main.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.main.id
+    gateway_id = data.aws_internet_gateway.main.id
   }
 
   tags = {
@@ -80,59 +62,18 @@ resource "aws_route_table" "public" {
 
 # Route Table Association for Public Subnets
 resource "aws_route_table_association" "public" {
-  count          = length(aws_subnet.public)
-  subnet_id      = aws_subnet.public[count.index].id
+  count          = length(data.aws_subnet.public)
+  subnet_id      = data.aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
 }
 
-# NAT Gateway
-resource "aws_eip" "nat" {
-  domain = "vpc"
-
-  tags = {
-    Name = "${var.project_name}-nat-eip"
-    Environment = var.environment
-  }
-}
-
-resource "aws_nat_gateway" "main" {
-  allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.public[0].id
-
-  tags = {
-    Name = "${var.project_name}-nat"
-    Environment = var.environment
-  }
-
-  depends_on = [aws_internet_gateway.main]
-}
-
-# Route Table for Private Subnets
-resource "aws_route_table" "private" {
-  vpc_id = aws_vpc.main.id
-
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.main.id
-  }
-
-  tags = {
-    Name = "${var.project_name}-private-rt"
-    Environment = var.environment
-  }
-}
-
-# Route Table Association for Private Subnets
-resource "aws_route_table_association" "private" {
-  count          = length(aws_subnet.private)
-  subnet_id      = aws_subnet.private[count.index].id
-  route_table_id = aws_route_table.private.id
-}
+# Note: Using public subnets only for simplicity
+# NAT Gateway and private subnets removed as default VPC doesn't have private subnets
 
 # Security Group for ALB
 resource "aws_security_group" "alb" {
   name_prefix = "${var.project_name}-alb-"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = data.aws_vpc.main.id
 
   ingress {
     from_port   = 80
@@ -164,7 +105,7 @@ resource "aws_security_group" "alb" {
 # Security Group for ECS Tasks
 resource "aws_security_group" "ecs_tasks" {
   name_prefix = "${var.project_name}-ecs-tasks-"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = data.aws_vpc.main.id
 
   ingress {
     from_port       = 8080
@@ -214,7 +155,7 @@ resource "aws_lb" "main" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
-  subnets            = aws_subnet.public[*].id
+  subnets            = data.aws_subnet.public[*].id
 
   enable_deletion_protection = false
 
@@ -229,7 +170,7 @@ resource "aws_lb_target_group" "backend" {
   name        = "${var.project_name}-backend-tg"
   port        = 8080
   protocol    = "HTTP"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = data.aws_vpc.main.id
   target_type = "ip"
 
   health_check {
@@ -255,7 +196,7 @@ resource "aws_lb_target_group" "frontend" {
   name        = "${var.project_name}-frontend-tg"
   port        = 3000
   protocol    = "HTTP"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = data.aws_vpc.main.id
   target_type = "ip"
 
   health_check {
@@ -305,7 +246,7 @@ resource "aws_lb_listener_rule" "backend" {
 
   condition {
     path_pattern {
-      values = ["/api/*"]
+      values = ["/api/*", "/actuator/*"]
     }
   }
 
@@ -367,15 +308,12 @@ output "cluster_id" {
 
 output "vpc_id" {
   description = "ID of the VPC"
-  value       = aws_vpc.main.id
+  value       = data.aws_vpc.main.id
 }
 
-output "private_subnet_ids" {
-  description = "IDs of the private subnets"
-  value       = aws_subnet.private[*].id
-}
+# Note: Private subnets not available in default VPC
 
 output "public_subnet_ids" {
   description = "IDs of the public subnets"
-  value       = aws_subnet.public[*].id
+  value       = data.aws_subnet.public[*].id
 }

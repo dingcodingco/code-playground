@@ -22,8 +22,11 @@ ARG NEXT_PUBLIC_APP_NAME
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 ENV NEXT_PUBLIC_APP_NAME=$NEXT_PUBLIC_APP_NAME
 
-# 의존성 복사
-COPY --from=deps /app/node_modules ./node_modules
+# 패키지 파일 복사 및 전체 의존성 설치 (빌드를 위해 devDependencies 포함)
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+# 소스 코드 복사
 COPY . .
 
 # Next.js 애플리케이션 빌드
@@ -33,9 +36,9 @@ RUN npm run build
 FROM node:20-alpine AS runner
 
 # 메타데이터 라벨
-LABEL maintainer="Vibe Coding Team <team@vibecoding.com>"
+LABEL maintainer="CodePlayground Team <team@codeplayground.com>"
 LABEL version="1.0.0"
-LABEL description="Vibe Coding Frontend Service"
+LABEL description="CodePlayground Frontend Service"
 
 WORKDIR /app
 

@@ -66,8 +66,8 @@ terraform --version
 ### 1. 저장소 클론 및 초기 설정
 ```bash
 # 프로젝트 클론
-git clone https://github.com/instructor/vibe-coding-demo.git
-cd vibe-coding-demo
+git clone https://github.com/instructor/code-playground-demo.git
+cd code-playground-demo
 
 # 프로젝트 구조 확인
 tree -I 'node_modules|.git|build|.next'
@@ -76,14 +76,11 @@ tree -I 'node_modules|.git|build|.next'
 ### 2. 환경 변수 설정
 
 #### Frontend 환경변수
-```bash
-# apps/frontend/.env.local 생성
-cd apps/frontend
-cat > .env.local << EOF
-NEXT_PUBLIC_API_URL=http://localhost:8080
-NEXT_PUBLIC_APP_NAME=바이브코딩 데모
-EOF
-```
+프론트엔드는 `next.config.js`에 정의된 기본값을 사용합니다:
+- `NEXT_PUBLIC_API_BASE_URL`: `http://localhost:8080/api/v1`
+- `NEXT_PUBLIC_APP_NAME`: `Vibe Coding`
+
+필요시 Docker 빌드 시점에 `--build-arg`로 오버라이드 가능합니다.
 
 #### Backend 환경변수
 ```bash
@@ -118,7 +115,7 @@ server:
 
 logging:
   level:
-    com.vibecoding: DEBUG
+    com.codeplayground: DEBUG
     org.springframework.web: DEBUG
 EOF
 ```
@@ -218,7 +215,7 @@ curl -X POST http://localhost:8080/api/code/execute \
 ## 📁 상세 프로젝트 구조
 
 ```
-vibe-coding-demo/
+code-playground-demo/
 ├── apps/
 │   ├── frontend/                    # Next.js 애플리케이션
 │   │   ├── app/                    # App Router (Next.js 13+)
@@ -238,15 +235,13 @@ vibe-coding-demo/
 │   │   │   ├── store.ts            # Zustand 스토어
 │   │   │   └── utils.ts            # 공통 유틸리티
 │   │   ├── public/                 # 정적 파일
-│   │   ├── .env.local              # 환경 변수
-│   │   ├── .env.example            # 환경 변수 예시
 │   │   ├── Dockerfile              # 프론트엔드 Docker 이미지
 │   │   ├── next.config.js          # Next.js 설정
 │   │   ├── package.json            # NPM 의존성
 │   │   ├── tailwind.config.js      # Tailwind CSS 설정
 │   │   └── tsconfig.json           # TypeScript 설정
 │   └── backend/                    # Spring Boot 애플리케이션
-│       ├── src/main/java/com/vibecoding/
+│       ├── src/main/java/com/codeplayground/
 │       │   ├── controller/         # REST 컨트롤러
 │       │   │   ├── CodeController.java      # 코드 실행 API
 │       │   │   ├── ShareController.java     # 공유 API
@@ -284,7 +279,6 @@ vibe-coding-demo/
 ├── infrastructure/               # Terraform 인프라 코드
 ├── docker/                      # Docker 설정
 │   ├── docker-compose.yml       # 로컬 개발용
-│   ├── docker-compose.prod.yml  # 프로덕션 테스트용
 │   └── nginx.conf              # Nginx 설정
 ├── scripts/                    # 유틸리티 스크립트
 ├── .github/workflows/          # GitHub Actions
@@ -326,7 +320,7 @@ vibe-coding-demo/
       "name": "Spring Boot Debug",
       "type": "java",
       "request": "launch",
-      "mainClass": "com.vibecoding.VibecodingApplication",
+      "mainClass": "com.codeplayground.VibecodingApplication",
       "projectName": "backend"
     }
   ]
@@ -347,11 +341,7 @@ yarn-error.log*
 build/
 dist/
 
-# Environment variables
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+# Note: Environment variables are configured in next.config.js and application.yml
 
 # IDE
 .vscode/

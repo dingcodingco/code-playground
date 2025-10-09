@@ -207,7 +207,7 @@ resource "aws_ecs_task_definition" "frontend" {
         },
         {
           name  = "NEXT_PUBLIC_APP_NAME"
-          value = "Vibe Coding"
+          value = "CodePlayground"
         },
         {
           name  = "API_BASE_URL"
@@ -244,9 +244,9 @@ resource "aws_ecs_service" "backend" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = aws_subnet.private[*].id
+    subnets         = data.aws_subnet.public[*].id
     security_groups = [aws_security_group.ecs_tasks.id]
-    assign_public_ip = false
+    assign_public_ip = true
   }
 
   load_balancer {
@@ -275,9 +275,9 @@ resource "aws_ecs_service" "frontend" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = aws_subnet.private[*].id
+    subnets         = data.aws_subnet.public[*].id
     security_groups = [aws_security_group.ecs_tasks.id]
-    assign_public_ip = false
+    assign_public_ip = true
   }
 
   load_balancer {

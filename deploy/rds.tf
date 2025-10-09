@@ -1,7 +1,7 @@
 # RDS Subnet Group
 resource "aws_db_subnet_group" "main" {
   name       = "${var.project_name}-db-subnet-group"
-  subnet_ids = aws_subnet.private[*].id
+  subnet_ids = data.aws_subnet.public[*].id
 
   tags = {
     Name = "${var.project_name}-db-subnet-group"
@@ -12,7 +12,7 @@ resource "aws_db_subnet_group" "main" {
 # Security Group for RDS
 resource "aws_security_group" "rds" {
   name_prefix = "${var.project_name}-rds-"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = data.aws_vpc.main.id
 
   ingress {
     from_port       = 5432

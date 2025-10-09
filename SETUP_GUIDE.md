@@ -119,7 +119,7 @@ aws configure
 ### 1. 프로젝트 클론
 ```bash
 git clone [repository-url]
-cd vibe-coding-project
+cd code-playground-project
 ```
 
 ### 2. Frontend 개발 환경
@@ -129,21 +129,12 @@ cd apps/frontend
 # 의존성 설치
 npm install
 
-# 환경변수 설정
-cp .env.example .env.local
-```
-
-**.env.local 파일 설정:**
-```env
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api/v1
-NEXT_PUBLIC_APP_NAME=VibeCoding
-```
-
-**개발 서버 실행:**
-```bash
+# 개발 서버 실행 (기본 설정 사용)
 npm run dev
 # http://localhost:3000 에서 접속
 ```
+
+**참고:** 프론트엔드는 `next.config.js`에 정의된 기본값을 사용합니다. 필요시 환경 변수를 Docker 빌드 시점에 주입할 수 있습니다.
 
 ### 3. Backend 개발 환경
 ```bash
@@ -181,7 +172,7 @@ cp terraform.tfvars.example terraform.tfvars
 # 기본 설정
 aws_region   = "ap-northeast-2"
 environment  = "production"
-project_name = "vibe-coding"
+project_name = "code-playground"
 domain_name  = "your-domain.com"
 
 # 네트워크 설정
@@ -191,13 +182,13 @@ public_subnets   = ["10.0.1.0/24", "10.0.2.0/24"]
 private_subnets  = ["10.0.10.0/24", "10.0.11.0/24"]
 
 # 데이터베이스 설정
-database_name     = "vibecoding"
-database_username = "vibecoding_admin"
+database_name     = "codeplayground"
+database_username = "codeplayground_admin"
 database_password = "ChangeMeInProduction123!"
 
 # ECS 설정 (이미지 URL은 나중에 업데이트)
-backend_image        = "851725513597.dkr.ecr.ap-northeast-2.amazonaws.com/vibe-coding-backend:latest"
-frontend_image       = "851725513597.dkr.ecr.ap-northeast-2.amazonaws.com/vibe-coding-frontend:latest"
+backend_image        = "851725513597.dkr.ecr.ap-northeast-2.amazonaws.com/code-playground-backend:latest"
+frontend_image       = "851725513597.dkr.ecr.ap-northeast-2.amazonaws.com/code-playground-frontend:latest"
 backend_cpu          = 512
 backend_memory       = 1024
 frontend_cpu         = 256
@@ -247,10 +238,10 @@ cd apps/frontend
 # x86_64 아키텍처로 빌드 (ECS Fargate 호환)
 docker build --platform linux/amd64 \
   --build-arg NEXT_PUBLIC_API_BASE_URL=http://[ALB_DNS_NAME]/api/v1 \
-  -t 851725513597.dkr.ecr.ap-northeast-2.amazonaws.com/vibe-coding-frontend:latest .
+  -t 851725513597.dkr.ecr.ap-northeast-2.amazonaws.com/code-playground-frontend:latest .
 
 # ECR에 푸시
-docker push 851725513597.dkr.ecr.ap-northeast-2.amazonaws.com/vibe-coding-frontend:latest
+docker push 851725513597.dkr.ecr.ap-northeast-2.amazonaws.com/code-playground-frontend:latest
 ```
 
 ### 3. Backend 이미지 빌드 및 푸시
@@ -259,10 +250,10 @@ cd apps/backend
 
 # x86_64 아키텍처로 빌드
 docker build --platform linux/amd64 \
-  -t 851725513597.dkr.ecr.ap-northeast-2.amazonaws.com/vibe-coding-backend:latest .
+  -t 851725513597.dkr.ecr.ap-northeast-2.amazonaws.com/code-playground-backend:latest .
 
 # ECR에 푸시
-docker push 851725513597.dkr.ecr.ap-northeast-2.amazonaws.com/vibe-coding-backend:latest
+docker push 851725513597.dkr.ecr.ap-northeast-2.amazonaws.com/code-playground-backend:latest
 ```
 
 ### 4. ECS 서비스 업데이트
@@ -306,8 +297,8 @@ aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS
 
 **ECS 태스크 로그:**
 ```bash
-# AWS 콘솔 → ECS → Clusters → vibe-coding-production → Tasks
-# 또는 CloudWatch Logs에서 /ecs/vibe-coding 로그 그룹 확인
+# AWS 콘솔 → ECS → Clusters → code-playground-production → Tasks
+# 또는 CloudWatch Logs에서 /ecs/code-playground 로그 그룹 확인
 ```
 
 **로컬 테스트:**
@@ -326,10 +317,10 @@ npm run dev
 **인프라 상태 확인:**
 ```bash
 # ECS 서비스 상태
-aws ecs describe-services --cluster vibe-coding-production --services vibe-coding-frontend vibe-coding-backend
+aws ecs describe-services --cluster code-playground-production --services code-playground-frontend code-playground-backend
 
 # ALB 상태
-aws elbv2 describe-load-balancers --names vibe-coding-alb
+aws elbv2 describe-load-balancers --names code-playground-alb
 ```
 
 **전체 인프라 삭제:**

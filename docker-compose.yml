@@ -6,6 +6,9 @@ services:
     build:
       context: ./apps/frontend
       dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+        - linux/arm64
     ports:
       - "3000:3000"
     environment:
@@ -30,13 +33,16 @@ services:
     build:
       context: ./apps/backend
       dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+        - linux/arm64
     ports:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/vibecoding
-      - SPRING_DATASOURCE_USERNAME=vibecoding
-      - SPRING_DATASOURCE_PASSWORD=vibecoding123
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/codeplayground
+      - SPRING_DATASOURCE_USERNAME=codeplayground
+      - SPRING_DATASOURCE_PASSWORD=codeplayground123
       - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
       - JAVA_OPTS=-Xms512m -Xmx1024m -XX:+UseG1GC
     depends_on:
@@ -55,41 +61,27 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: vibe-coding-db
+    container_name: code-playground-db
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_DB=vibecoding
-      - POSTGRES_USER=vibecoding
-      - POSTGRES_PASSWORD=vibecoding123
+      - POSTGRES_DB=codeplayground
+      - POSTGRES_USER=codeplayground
+      - POSTGRES_PASSWORD=codeplayground123
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - vibe-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U vibecoding -d vibecoding"]
+      test: ["CMD-SHELL", "pg_isready -U codeplayground -d codeplayground"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
 
-  # Redis (캐싱용 - 선택사항)
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - vibe-network
-    restart: unless-stopped
-    profiles:
-      - cache
-
 volumes:
   postgres_data:
-  redis_data:
 
 networks:
   vibe-network:

@@ -1,5 +1,5 @@
 {
-  "name": "vibe-coding-frontend",
+  "name": "code-playground-frontend",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test:ci": "npm run type-check && npm run lint"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",

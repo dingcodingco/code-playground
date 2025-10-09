@@ -114,6 +114,6 @@ curl "http://{alb-dns}/api/v1/snippets?page=0&size=5"
 
 ## Monitoring
 
-- CloudWatch Logs: `/ecs/vibe-coding`
-- ECS Service: `vibe-coding-backend`, `vibe-coding-frontend`
-- RDS Instance: `vibe-coding-db`
+- CloudWatch Logs: `/ecs/code-playground`
+- ECS Service: `code-playground-backend`, `code-playground-frontend`
+- RDS Instance: `code-playground-db`

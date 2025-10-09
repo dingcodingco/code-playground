@@ -1,7 +1,7 @@
-# Vibe Coding Monitoring Stack
+# CodePlayground Monitoring Stack
 
 ## Overview
-Complete observability solution for Vibe Coding platform with metrics, logs, and distributed tracing.
+Complete observability solution for CodePlayground platform with metrics, logs, and distributed tracing.
 
 ## Components
 
@@ -48,7 +48,7 @@ cd tracing && docker-compose -f docker-compose.tracing.yml up -d
 
 | Service | URL | Credentials |
 |---------|-----|-------------|
-| Grafana | http://localhost:3001 | admin/vibecoding2024 |
+| Grafana | http://localhost:3001 | admin/codeplayground2024 |
 | Prometheus | http://localhost:9090 | - |
 | AlertManager | http://localhost:9093 | - |
 | Kibana | http://localhost:5601 | - |
@@ -167,7 +167,7 @@ curl -X POST http://localhost:9090/api/v1/admin/tsdb/snapshot
 ### Cleanup
 ```bash
 # Remove old indices
-curator --config curator.yml delete indices --older-than 30 --prefix vibe-coding-
+curator --config curator.yml delete indices --older-than 30 --prefix code-playground-
 
 # Clean Docker volumes
 docker volume prune
@@ -247,4 +247,4 @@ prometheus:
 - Regular security updates
 
 ## Contact
-For issues or questions, contact the DevOps team at devops@vibecoding.com
+For issues or questions, contact the DevOps team at devops@codeplayground.com

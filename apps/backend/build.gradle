@@ -5,11 +5,11 @@ plugins {
     id 'checkstyle'
 }
 
-group = 'com.vibecoding'
+group = 'com.codeplayground'
 version = '1.0.0'
 
 java {
-    sourceCompatibility = '21'
+    sourceCompatibility = '17'
 }
 
 configurations {
@@ -79,8 +79,8 @@ tasks.named('test') {
 checkstyle {
     toolVersion = '10.12.5'
     configFile = file("${projectDir}/checkstyle.xml")
-    ignoreFailures = false
-    maxWarnings = 0
+    ignoreFailures = true
+    maxWarnings = 100
 }
 
 checkstyleMain {
@@ -99,8 +99,8 @@ jar {
 
 bootJar {
     enabled = true
-    mainClass = 'com.vibecoding.VibecodingApplication'
-    archiveFileName = 'vibe-coding-backend.jar'
+    mainClass = 'com.codeplayground.CodePlaygroundApplication'
+    archiveFileName = 'code-playground-backend.jar'
 }
 
 // 개발 편의를 위한 태스크

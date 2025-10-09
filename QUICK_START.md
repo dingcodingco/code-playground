@@ -1,6 +1,6 @@
-# ⚡ Vibe Coding - Quick Start Guide
+# ⚡ CodePlayground - Quick Start Guide
 
-This guide helps you deploy Vibe Coding to AWS in less than 10 minutes.
+This guide helps you deploy CodePlayground to AWS in less than 10 minutes.
 
 ## 📋 Prerequisites
 
@@ -14,7 +14,7 @@ This guide helps you deploy Vibe Coding to AWS in less than 10 minutes.
 ### Step 1: Clone and Setup
 ```bash
 git clone <repository-url>
-cd vibe-coding
+cd code-playground
 ```
 
 ### Step 2: Configure AWS
@@ -22,9 +22,14 @@ cd vibe-coding
 # Configure AWS CLI (if not already done)
 aws configure
 
+# Get your AWS Account ID (needed for configuration)
+aws sts get-caller-identity --query Account --output text
+
 # Verify your AWS account
 aws sts get-caller-identity
 ```
+
+**📝 Note:** Save your AWS Account ID (12-digit number) - you'll need it in the next step!
 
 ### Step 3: Update Configuration
 ```bash
@@ -36,10 +41,15 @@ vim deploy/terraform.tfvars
 ```
 
 **⚠️ Required Changes in `deploy/terraform.tfvars`:**
-- Replace `YOUR_ACCOUNT_ID` with your AWS Account ID
-- Replace `YOUR_REGION` with your preferred AWS region
-- Change `CHANGE_ME_TO_SECURE_PASSWORD` to a secure password
+- Replace `YOUR_ACCOUNT_ID` with your AWS Account ID (12-digit number from Step 2)
+- Replace `YOUR_REGION` with your preferred AWS region (e.g., `us-east-1`, `ap-northeast-2`)
+- Change `CHANGE_ME_TO_SECURE_PASSWORD` to a secure database password
 - Change `CHANGE_ME_TO_SECURE_JWT_SECRET` to a secure JWT secret
+
+**💡 How to get your AWS Account ID:**
+```bash
+aws sts get-caller-identity --query Account --output text
+```
 
 ### Step 4: Deploy to AWS
 ```bash
@@ -53,12 +63,12 @@ chmod +x deploy.sh
 ### Step 5: Access Your Application
 ```bash
 # Get your application URL from the output
-# Example: http://vibe-coding-alb-123456789.region.elb.amazonaws.com
+# Example: http://code-playground-alb-123456789.region.elb.amazonaws.com
 ```
 
 ## 🎉 That's It!
 
-Your Vibe Coding platform is now running on AWS with:
+Your CodePlayground platform is now running on AWS with:
 - ✅ Auto-scaling containers (ECS)
 - ✅ Load balancer (ALB)
 - ✅ Managed database (RDS PostgreSQL)
@@ -69,10 +79,7 @@ Your Vibe Coding platform is now running on AWS with:
 
 For local development:
 ```bash
-# Copy environment template
-cp .env.example .env
-
-# Start all services
+# Start all services with Docker Compose
 docker-compose up -d
 
 # Access locally
@@ -105,7 +112,7 @@ open http://localhost:3000
 4. **Application not accessible**
    ```bash
    # Check ECS service status
-   aws ecs describe-services --services vibe-coding-frontend
+   aws ecs describe-services --services code-playground-frontend
    ```
 
 **Get Support:**

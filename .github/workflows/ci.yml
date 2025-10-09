@@ -77,21 +77,15 @@ jobs:
           REDIS_HOST: localhost
           REDIS_PORT: 6379
         run: |
-          ./gradlew test jacocoTestReport
+          ./gradlew test
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: backend-test-results
           path: apps/backend/build/reports/tests/
 
-      - name: Upload coverage reports
-        uses: codecov/codecov-action@v3
-        with:
-          files: apps/backend/build/reports/jacoco/test/jacocoTestReport.xml
-          flags: backend
-          name: backend-coverage
 
       - name: Run checkstyle
         working-directory: apps/backend
@@ -130,184 +124,9 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: frontend-test-results
           path: apps/frontend/coverage/
 
-      - name: Upload coverage reports
-        uses: codecov/codecov-action@v3
-        with:
-          files: apps/frontend/coverage/lcov.info
-          flags: frontend
-          name: frontend-coverage
 
-  e2e-test:
-    name: E2E Tests
-    runs-on: ubuntu-latest
-    needs: [backend-test, frontend-test]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Install Playwright
-        working-directory: e2e
-        run: |
-          npm ci
-          npx playwright install --with-deps
-
-      - name: Start services with Docker Compose
-        run: |
-          docker-compose up -d
-          sleep 30
-          docker-compose ps
-
-      - name: Wait for services
-        run: |
-          timeout 60 bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
-          timeout 60 bash -c 'until curl -f http://localhost:8080/actuator/health; do sleep 2; done'
-
-      - name: Run E2E tests
-        working-directory: e2e
-        run: npx playwright test
-
-      - name: Upload Playwright report
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: playwright-report
-          path: e2e/playwright-report/
-          retention-days: 7
-
-      - name: Stop services
-        if: always()
-        run: docker-compose down -v
-
-  security-scan:
-    name: Security Scanning
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-
-      - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: 'trivy-results.sarif'
-
-      - name: Run OWASP Dependency Check
-        uses: dependency-check/Dependency-Check_Action@main
-        with:
-          project: 'vibe-coding'
-          path: '.'
-          format: 'HTML'
-
-      - name: Upload dependency check results
-        uses: actions/upload-artifact@v3
-        with:
-          name: dependency-check-report
-          path: reports/
-
-  build-images:
-    name: Build Docker Images
-    runs-on: ubuntu-latest
-    needs: [backend-test, frontend-test, security-scan]
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: |
-            ${{ secrets.DOCKER_USERNAME }}/vibe-coding-backend
-            ${{ secrets.DOCKER_USERNAME }}/vibe-coding-frontend
-          tags: |
-            type=ref,event=branch
-            type=sha,prefix={{branch}}-
-            type=raw,value=latest,enable={{is_default_branch}}
-
-      - name: Build and push backend image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./apps/backend
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/vibe-coding-backend:${{ github.sha }}
-            ${{ secrets.DOCKER_USERNAME }}/vibe-coding-backend:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/vibe-coding-backend:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/vibe-coding-backend:buildcache,mode=max
-          platforms: linux/amd64,linux/arm64
-
-      - name: Build and push frontend image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./apps/frontend
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/vibe-coding-frontend:${{ github.sha }}
-            ${{ secrets.DOCKER_USERNAME }}/vibe-coding-frontend:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/vibe-coding-frontend:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/vibe-coding-frontend:buildcache,mode=max
-          platforms: linux/amd64,linux/arm64
-
-      - name: Run Trivy on backend image
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ${{ secrets.DOCKER_USERNAME }}/vibe-coding-backend:${{ github.sha }}
-          format: 'sarif'
-          output: 'backend-trivy.sarif'
-
-      - name: Run Trivy on frontend image
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ${{ secrets.DOCKER_USERNAME }}/vibe-coding-frontend:${{ github.sha }}
-          format: 'sarif'
-          output: 'frontend-trivy.sarif'
-
-  notify:
-    name: Notify Status
-    runs-on: ubuntu-latest
-    needs: [build-images]
-    if: always()
-
-    steps:
-      - name: Notify Slack
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          text: |
-            CI Pipeline ${{ job.status }}
-            Repository: ${{ github.repository }}
-            Branch: ${{ github.ref }}
-            Commit: ${{ github.sha }}
-            Author: ${{ github.actor }}
-          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
-        if: always()

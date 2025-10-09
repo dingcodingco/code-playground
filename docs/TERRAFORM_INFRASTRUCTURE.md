@@ -552,7 +552,7 @@ resource "aws_db_instance" "main" {
 # infrastructure/environments/dev/main.tf
 terraform {
   backend "s3" {
-    bucket = "vibe-coding-terraform-state-dev"
+    bucket = "code-playground-terraform-state-dev"
     key    = "dev/terraform.tfstate"
     region = "ap-northeast-2"
   }
@@ -581,7 +581,7 @@ module "rds" {
   allocated_storage = 10
   multi_az         = false
 
-  database_name = "vibecoding_dev"
+  database_name = "codeplayground_dev"
   username      = "admin"
   password      = var.db_password
 
@@ -599,7 +599,7 @@ module "rds" {
 # infrastructure/environments/prod/main.tf
 terraform {
   backend "s3" {
-    bucket = "vibe-coding-terraform-state-prod"
+    bucket = "code-playground-terraform-state-prod"
     key    = "prod/terraform.tfstate"
     region = "ap-northeast-2"
   }
@@ -616,7 +616,7 @@ module "rds" {
   allocated_storage = 20
   multi_az         = true
 
-  database_name = "vibecoding"
+  database_name = "codeplayground"
   username      = "admin"
   password      = var.db_password
 

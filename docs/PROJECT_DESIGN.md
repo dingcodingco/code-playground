@@ -78,7 +78,7 @@
 ## 📁 프로젝트 구조 (모노레포)
 
 ```
-vibe-coding-demo/
+code-playground-demo/
 ├── apps/
 │   ├── frontend/                 # Next.js 애플리케이션
 │   │   ├── app/                 # App Router 구조
@@ -98,7 +98,7 @@ vibe-coding-demo/
 │   │   ├── package.json
 │   │   └── next.config.js
 │   └── backend/                 # Spring Boot API
-│       ├── src/main/java/com/vibecoding/
+│       ├── src/main/java/com/codeplayground/
 │       │   ├── controller/      # REST 컨트롤러
 │       │   │   ├── CodeController.java
 │       │   │   └── ShareController.java
@@ -133,7 +133,6 @@ vibe-coding-demo/
 │       └── prod/
 ├── docker/                     # 로컬 개발용 Docker 설정
 │   ├── docker-compose.yml     # 로컬 개발 환경
-│   ├── docker-compose.prod.yml # 프로덕션 환경 테스트용
 │   └── nginx.conf             # Nginx 설정
 ├── scripts/                    # 유틸리티 스크립트
 │   ├── dev-start.sh           # 개발 환경 시작
@@ -179,8 +178,8 @@ cd apps/backend && ./gradlew bootRun
 
 ### 환경 변수
 ```bash
-# Frontend (.env.local)
-NEXT_PUBLIC_API_URL=http://localhost:8080
+# Frontend: 기본값은 next.config.js에 정의
+# NEXT_PUBLIC_API_BASE_URL: http://localhost:8080/api/v1
 
 # Backend (application-dev.yml)
 spring:

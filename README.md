@@ -1,4 +1,4 @@
-# 🚀 Vibe Coding - Cloud-Native Code Collaboration Platform
+# 🚀 CodePlayground - Cloud-Native Code Execution Platform
 
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 ![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)
@@ -6,7 +6,7 @@
 ![AWS](https://img.shields.io/badge/AWS-ECS-orange.svg)
 ![Terraform](https://img.shields.io/badge/Terraform-1.5+-purple.svg)
 
-Vibe Coding is a modern, cloud-native code collaboration platform that enables developers to write, execute, and share code snippets in real-time. Built with Next.js, Spring Boot, and deployed on AWS infrastructure.
+CodePlayground is a modern, cloud-native code execution platform that enables developers to write, execute, and share code snippets in real-time. Built with Next.js, Spring Boot, and deployed on AWS infrastructure.
 
 ## ✨ Features
 
@@ -72,7 +72,7 @@ Vibe Coding is a modern, cloud-native code collaboration platform that enables d
 
 ```bash
 git clone <repository-url>
-cd vibe-coding
+cd code-playground
 ```
 
 ### 2. Configure AWS Deployment
@@ -118,7 +118,7 @@ open http://localhost:3000
 ## 📦 Project Structure
 
 ```
-vibe-coding/
+code-playground/
 ├── apps/
 │   ├── frontend/           # Next.js application
 │   │   ├── src/
@@ -155,18 +155,19 @@ vibe-coding/
 
 ### Environment Variables
 
-**Frontend (`apps/frontend/.env.local`):**
-```env
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api/v1
-NEXT_PUBLIC_APP_NAME=Vibe Coding
-```
+**Frontend:**
+Environment variables are configured in `next.config.js` with default values:
+- `NEXT_PUBLIC_API_BASE_URL`: Default `http://localhost:8080/api/v1`
+- `NEXT_PUBLIC_APP_NAME`: Default `Vibe Coding`
+
+Override these during Docker build if needed using `--build-arg`.
 
 **Backend (`apps/backend/application.yml`):**
 ```yaml
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/vibecoding
-    username: vibecoding_admin
+    url: jdbc:postgresql://localhost:5432/codeplayground
+    username: codeplayground_admin
     password: your-password
   jpa:
     hibernate:
@@ -198,7 +199,7 @@ Access monitoring dashboards:
 open http://<alb-dns>/grafana
 
 # Application Logs
-aws logs tail /ecs/vibe-coding --follow
+aws logs tail /ecs/code-playground --follow
 ```
 
 ## 🧪 Testing
@@ -248,7 +249,7 @@ terraform apply -var="active_deployment=green"
 ### Rolling Updates
 ```bash
 # Gradual deployment with zero downtime
-aws ecs update-service --service vibe-coding-frontend --force-new-deployment
+aws ecs update-service --service code-playground-frontend --force-new-deployment
 ```
 
 ## 📈 Scaling
@@ -268,10 +269,10 @@ resource "aws_appautoscaling_target" "ecs_target" {
 ### Manual Scaling
 ```bash
 # Scale frontend service
-aws ecs update-service --service vibe-coding-frontend --desired-count 3
+aws ecs update-service --service code-playground-frontend --desired-count 3
 
 # Scale backend service
-aws ecs update-service --service vibe-coding-backend --desired-count 5
+aws ecs update-service --service code-playground-backend --desired-count 5
 ```
 
 ## 🐛 Troubleshooting
@@ -291,7 +292,7 @@ aws sts get-caller-identity
 **2. Application Not Accessible**
 ```bash
 # Check ECS service status
-aws ecs describe-services --services vibe-coding-frontend
+aws ecs describe-services --services code-playground-frontend
 
 # Check load balancer health
 aws elbv2 describe-target-health --target-group-arn <target-group-arn>
@@ -300,22 +301,22 @@ aws elbv2 describe-target-health --target-group-arn <target-group-arn>
 **3. Database Connection Issues**
 ```bash
 # Check RDS instance status
-aws rds describe-db-instances --db-instance-identifier vibe-coding-db
+aws rds describe-db-instances --db-instance-identifier code-playground-db
 
 # Test database connectivity
-psql -h <rds-endpoint> -U vibecoding_admin -d vibecoding
+psql -h <rds-endpoint> -U codeplayground_admin -d codeplayground
 ```
 
 ### Logs and Debugging
 ```bash
 # Application logs
-aws logs tail /ecs/vibe-coding --follow
+aws logs tail /ecs/code-playground --follow
 
 # ECS service events
-aws ecs describe-services --services vibe-coding-frontend --query 'services[0].events'
+aws ecs describe-services --services code-playground-frontend --query 'services[0].events'
 
 # CloudFormation stack events (if using)
-aws cloudformation describe-stack-events --stack-name vibe-coding
+aws cloudformation describe-stack-events --stack-name code-playground
 ```
 
 ## 🤝 Contributing
@@ -365,4 +366,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Built with ❤️ by the Vibe Coding Team**
+**Built with ❤️ by the CodePlayground Team**
