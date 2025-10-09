@@ -1,4 +1,4 @@
--- Initial schema creation for VibeCoding application
+-- Initial schema creation for Code Playground application
 -- Creates all necessary tables with proper constraints and indexes
 
 -- Create code_snippets table

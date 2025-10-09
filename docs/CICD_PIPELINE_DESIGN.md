@@ -2,7 +2,7 @@
 
 ## 📋 개요
 
-GitHub Actions를 활용한 바이브코딩 서비스의 CI/CD 파이프라인 설계 문서입니다. Terraform과 AWS ECS Fargate를 통한 완전 자동화된 배포 프로세스를 제공합니다.
+GitHub Actions를 활용한 Code Playground 서비스의 CI/CD 파이프라인 설계 문서입니다. Terraform과 AWS ECS Fargate를 통한 완전 자동화된 배포 프로세스를 제공합니다.
 
 ## 🔄 CI/CD 전체 플로우
 

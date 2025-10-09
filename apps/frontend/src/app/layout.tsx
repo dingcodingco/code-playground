@@ -16,10 +16,10 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Vibe Coding - 코드 작성, 실행, 공유 플랫폼',
+  title: 'Code Playground - 코드 작성, 실행, 공유 플랫폼',
   description: '실시간으로 코드를 작성하고 실행하며 공유할 수 있는 온라인 플랫폼입니다.',
   keywords: ['코딩', '프로그래밍', '온라인 에디터', 'JavaScript', 'Python', 'Java'],
-  authors: [{ name: 'Vibe Coding Team' }],
+  authors: [{ name: 'Code Playground Team' }],
   viewport: 'width=device-width, initial-scale=1',
 };
 

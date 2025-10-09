@@ -158,7 +158,7 @@ code-playground/
 **Frontend:**
 Environment variables are configured in `next.config.js` with default values:
 - `NEXT_PUBLIC_API_BASE_URL`: Default `http://localhost:8080/api/v1`
-- `NEXT_PUBLIC_APP_NAME`: Default `Vibe Coding`
+- `NEXT_PUBLIC_APP_NAME`: Default `Code Playground`
 
 Override these during Docker build if needed using `--build-arg`.
 

@@ -1,6 +1,6 @@
-# VibeCoding 프로젝트 설정 가이드
+# Code Playground 프로젝트 설정 가이드
 
-처음 VibeCoding 프로젝트를 설정하는 개발자를 위한 종합 가이드입니다.
+처음 Code Playground 프로젝트를 설정하는 개발자를 위한 종합 가이드입니다.
 
 ## 📋 목차
 1. [프로젝트 개요](#프로젝트-개요)
@@ -12,7 +12,7 @@
 
 ## 🎯 프로젝트 개요
 
-VibeCoding은 온라인 코드 편집 및 실행 플랫폼입니다.
+Code Playground는 온라인 코드 편집 및 실행 플랫폼입니다.
 
 ### 기술 스택
 - **Frontend**: Next.js 14, React, TypeScript, Tailwind CSS
@@ -344,4 +344,4 @@ terraform destroy
 
 ---
 
-*본 문서는 VibeCoding v1.0 기준으로 작성되었습니다. 최신 버전에서는 일부 설정이 다를 수 있습니다.*
+*본 문서는 Code Playground v1.0 기준으로 작성되었습니다. 최신 버전에서는 일부 설정이 다를 수 있습니다.*

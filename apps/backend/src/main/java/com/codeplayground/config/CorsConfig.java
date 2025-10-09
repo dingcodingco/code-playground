@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * CORS 설정 클래스.
- * application.yml의 vibe-coding.security.cors 설정을 활용하여 CORS를 구성합니다.
+ * application.yml의 code-playground.security.cors 설정을 활용하여 CORS를 구성합니다.
  */
 @Configuration
 public class CorsConfig {

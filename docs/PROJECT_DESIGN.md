@@ -1,9 +1,9 @@
-# 바이브코딩 데모 프로젝트 설계 문서
+# Code Playground 데모 프로젝트 설계 문서
 
 ## 📋 프로젝트 개요
 
 ### 목적
-수강생들을 위한 Docker 기반 바이브코딩 서비스 데모 프로젝트로, 풀스택 개발부터 AWS 배포까지의 전체 과정을 학습할 수 있도록 설계
+수강생들을 위한 Docker 기반 Code Playground 서비스 데모 프로젝트로, 풀스택 개발부터 AWS 배포까지의 전체 과정을 학습할 수 있도록 설계
 
 ### 핵심 목표
 - Docker 컨테이너화 실습
@@ -113,7 +113,7 @@ code-playground-demo/
 │       │   ├── config/          # 설정 클래스
 │       │   │   ├── CorsConfig.java
 │       │   │   └── SecurityConfig.java
-│       │   └── VibecodingApplication.java
+│       │   └── CodePlaygroundApplication.java
 │       ├── src/main/resources/
 │       │   ├── application.yml
 │       │   ├── application-dev.yml

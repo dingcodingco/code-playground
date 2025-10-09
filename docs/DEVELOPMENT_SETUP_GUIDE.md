@@ -2,7 +2,7 @@
 
 ## 📋 개요
 
-바이브코딩 데모 프로젝트의 로컬 개발환경 설정부터 AWS 배포까지의 전체 가이드입니다.
+Code Playground 데모 프로젝트의 로컬 개발환경 설정부터 AWS 배포까지의 전체 가이드입니다.
 
 ## 🛠️ 사전 요구사항
 
@@ -78,7 +78,7 @@ tree -I 'node_modules|.git|build|.next'
 #### Frontend 환경변수
 프론트엔드는 `next.config.js`에 정의된 기본값을 사용합니다:
 - `NEXT_PUBLIC_API_BASE_URL`: `http://localhost:8080/api/v1`
-- `NEXT_PUBLIC_APP_NAME`: `Vibe Coding`
+- `NEXT_PUBLIC_APP_NAME`: `Code Playground`
 
 필요시 Docker 빌드 시점에 `--build-arg`로 오버라이드 가능합니다.
 
@@ -173,7 +173,7 @@ docker-compose down
 cd apps/backend
 ./gradlew bootRun
 
-# 또는 IDE에서 VibecodingApplication.java 실행
+# 또는 IDE에서 CodePlaygroundApplication.java 실행
 ```
 
 #### Terminal 2 - Frontend 실행
@@ -266,7 +266,7 @@ code-playground-demo/
 │       │   │   ├── request/
 │       │   │   └── response/
 │       │   ├── exception/          # 예외 처리
-│       │   └── VibecodingApplication.java  # 메인 클래스
+│       │   └── CodePlaygroundApplication.java  # 메인 클래스
 │       ├── src/main/resources/
 │       │   ├── application.yml     # 기본 설정
 │       │   ├── application-dev.yml # 개발환경 설정
@@ -320,7 +320,7 @@ code-playground-demo/
       "name": "Spring Boot Debug",
       "type": "java",
       "request": "launch",
-      "mainClass": "com.codeplayground.VibecodingApplication",
+      "mainClass": "com.codeplayground.CodePlaygroundApplication",
       "projectName": "backend"
     }
   ]

@@ -1,4 +1,4 @@
-# CLAUDE.md - Project-Specific Guidelines for VibeCoding
+# CLAUDE.md - Project-Specific Guidelines for Code Playground
 
 ## Flyway Migration Rules
 

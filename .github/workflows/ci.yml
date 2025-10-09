@@ -33,16 +33,6 @@ jobs:
         ports:
           - 5432:5432
 
-      redis:
-        image: redis:7-alpine
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 6379:6379
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -74,8 +64,6 @@ jobs:
           DATABASE_URL: jdbc:postgresql://localhost:5432/testdb
           DATABASE_USERNAME: testuser
           DATABASE_PASSWORD: testpass
-          REDIS_HOST: localhost
-          REDIS_PORT: 6379
         run: |
           ./gradlew test
 
